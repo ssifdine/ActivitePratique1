@@ -25,6 +25,6 @@ public class ProductDTO {
     private Double price;
 
     @NotNull(message = "La quantité est obligatoire")
-    @Min(value = 0, message = "La quantité doit être positive")
+    @Min(value = 1, message = "La quantité doit être positive")
     private Integer quantity;
 }

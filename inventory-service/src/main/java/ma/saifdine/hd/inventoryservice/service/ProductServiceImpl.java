@@ -54,4 +54,13 @@ public class ProductServiceImpl implements ProductService {
 
         return productMapper.toDto(productRepository.save(product));
     }
+
+    @Override
+    public ProductDTO updateProductQuantity(Long id, Integer quantity) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+        product.setQuantity(quantity);
+        productRepository.save(product);
+        return productMapper.toDto(product);
+    }
 }

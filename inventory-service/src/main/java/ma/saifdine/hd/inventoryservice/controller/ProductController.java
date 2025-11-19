@@ -1,5 +1,6 @@
 package ma.saifdine.hd.inventoryservice.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import ma.saifdine.hd.inventoryservice.dtos.ProductDTO;
 import ma.saifdine.hd.inventoryservice.service.ProductService;
@@ -17,7 +18,7 @@ public class ProductController {
 
     // 🔹 Créer un produit
     @PostMapping
-    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDTO) {
+    public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductDTO productDTO) {
         ProductDTO createdProduct = productService.addProduct(productDTO);
         return ResponseEntity.ok(createdProduct);
     }
@@ -49,4 +50,13 @@ public class ProductController {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
+
+    // 🔹 Mettre à jour la quantity d'un produit
+    @PutMapping("/{id}/quantity")
+    public ResponseEntity<ProductDTO> updateProductQuantity(@PathVariable Long id, @RequestParam Integer quantity) {
+        ProductDTO updatedProductQuantity = productService.updateProductQuantity(id, quantity);
+        return ResponseEntity.ok(updatedProductQuantity);
+    }
+
+
 }

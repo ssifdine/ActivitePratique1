@@ -16,6 +16,8 @@ public interface ProductService {
 
         ProductDTO updateProduct(Long id,ProductDTO productDTO);
 
+        ProductDTO updateProductQuantity(Long id,Integer quantity);
+
 
 
 
