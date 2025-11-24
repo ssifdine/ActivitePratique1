@@ -22,4 +22,14 @@ public class GlobalExceptionHandler {
                         "message", e.getMessage()
                 ));
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleGenericException(Exception ex) {
+        log.error("Unexpected error: {}", ex.getMessage(), ex);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of(
+                        "timestamp", LocalDateTime.now(),
+                        "message", ex.getMessage()
+                ));    }
 }
