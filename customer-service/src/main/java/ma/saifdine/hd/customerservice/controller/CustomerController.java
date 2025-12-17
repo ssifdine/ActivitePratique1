@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import ma.saifdine.hd.customerservice.dtos.CustomerRequestDTO;
 import ma.saifdine.hd.customerservice.dtos.CustomerResponseDTO;
 import ma.saifdine.hd.customerservice.service.CustomerService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +33,20 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.getAllCustomers());
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<Page<CustomerResponseDTO>> searchCustomerPagenation(
+            @RequestParam(name = "keyword", defaultValue = "") String keyword,
+            @RequestParam(name = "page", defaultValue = "0" ) int page,
+            @RequestParam(name = "size", defaultValue = "10") int size
+    ){
+        int safeSize = (size < 1) ? 10 : size; // s'assure que size >= 1
+        Page<CustomerResponseDTO> customers = customerService.searchCustomerByPagenation(page, safeSize, keyword);
+        return ResponseEntity.ok(customers);
+    }
+
+
     @PutMapping("/{id}")
-    public ResponseEntity<CustomerResponseDTO> update(@PathVariable Long id,
+    public ResponseEntity<CustomerResponseDTO> updateCustomer(@PathVariable Long id,
                                                       @Valid @RequestBody CustomerRequestDTO dto) {
         return ResponseEntity.ok(customerService.updateCustomer(id, dto));
     }

@@ -14,7 +14,7 @@ public interface CustomerMapper {
     @Mapping(target = "address", expression = "java(mapAddress(dto))")
     Customer toEntity(CustomerRequestDTO dto);
 
-    @Mapping(target = "fullName", expression = "java(customer.getFirstName() + \" \" + customer.getLastName())")
+    @Mapping(target = "fullName", source = "customer.fullName")
     @Mapping(target = "street", source = "address.street")
     @Mapping(target = "city", source = "address.city")
     @Mapping(target = "country", source = "address.country")

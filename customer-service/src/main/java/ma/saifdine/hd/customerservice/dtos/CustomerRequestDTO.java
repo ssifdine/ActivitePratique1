@@ -13,11 +13,7 @@ public class CustomerRequestDTO {
 
     @NotBlank
     @Size(min = 2)
-    private String firstName;
-
-    @NotBlank
-    @Size(min = 2)
-    private String lastName;
+    private String fullName;
 
     @Email
     private String email;

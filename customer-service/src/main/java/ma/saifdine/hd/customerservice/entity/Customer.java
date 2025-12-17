@@ -19,15 +19,10 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Le nom est obligatoire")
+    @NotBlank(message = "Le nom complet est obligatoire")
     @Size(min = 2, max = 50)
     @Column(nullable = false)
-    private String firstName;
-
-    @NotBlank(message = "Le prénom est obligatoire")
-    @Size(min = 2, max = 50)
-    @Column(nullable = false)
-    private String lastName;
+    private String fullName;
 
     @Email(message = "Email non valide")
     @Column(unique = true, nullable = false)
