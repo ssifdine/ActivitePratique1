@@ -1,0 +1,111 @@
+<nav class="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white shadow-2xl border-b border-gray-700">
+  <div class="max-w-7xl mx-auto px-6 py-4">
+    <div class="flex items-center justify-between">
+
+      <!-- Logo / App name -->
+      <div class="flex items-center gap-3 group">
+        <!-- App Icon with gradient background -->
+        <div class="relative">
+          <div class="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg blur opacity-50 group-hover:opacity-75 transition-opacity"></div>
+          <div class="relative w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                    d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="flex flex-col">
+          <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            App-MicroService
+          </span>
+          <span class="text-xs text-gray-400 -mt-1">Management Dashboard</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <div class="flex items-center gap-2">
+
+        <!-- Clients -->
+        <a routerLink="/customers"
+           routerLinkActive="bg-blue-600 text-white shadow-lg shadow-blue-500/30"
+           class="flex items-center gap-2 px-4 py-2.5 rounded-xl hover:bg-gray-700 transition-all duration-300 group relative overflow-hidden">
+          <!-- Hover effect background -->
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
+
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 relative z-10 group-hover:scale-110 transition-transform"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-3-3h-2m-2.5-4a4 4 0 11-8 0 4 4 0 018 0zM3 20h10v-2a3 3 0 00-3-3H6a3 3 0 00-3 3v2z"/>
+          </svg>
+          <span class="font-medium relative z-10">Clients</span>
+
+          <!-- Active indicator -->
+          <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform"></div>
+        </a>
+
+        <!-- Products -->
+        <a routerLink="/products"
+           routerLinkActive="bg-green-600 text-white shadow-lg shadow-green-500/30"
+           class="flex items-center gap-2 px-4 py-2.5 rounded-xl hover:bg-gray-700 transition-all duration-300 group relative overflow-hidden">
+          <!-- Hover effect background -->
+          <div class="absolute inset-0 bg-gradient-to-r from-green-600 to-green-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
+
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 relative z-10 group-hover:scale-110 transition-transform"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+          <span class="font-medium relative z-10">Produits</span>
+
+          <!-- Active indicator -->
+          <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-green-400 to-emerald-500 transform scale-x-0 group-hover:scale-x-100 transition-transform"></div>
+        </a>
+
+        <!-- Factures -->
+        <a routerLink="/bills"
+           routerLinkActive="bg-purple-600 text-white shadow-lg shadow-purple-500/30"
+           class="flex items-center gap-2 px-4 py-2.5 rounded-xl hover:bg-gray-700 transition-all duration-300 group relative overflow-hidden">
+          <!-- Hover effect background -->
+          <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
+
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 relative z-10 group-hover:scale-110 transition-transform"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <span class="font-medium relative z-10">Factures</span>
+
+          <!-- Active indicator -->
+          <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-400 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform"></div>
+        </a>
+
+        <!-- Separator -->
+        <div class="w-px h-8 bg-gray-700 mx-2"></div>
+
+        <!-- User Menu / Profile -->
+<!--        <div class="flex items-center gap-3 pl-2">-->
+<!--          <button class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-700 transition-all group">-->
+<!--            <div class="w-8 h-8 bg-gradient-to-br from-orange-400 to-pink-500 rounded-full flex items-center justify-center text-sm font-bold shadow-lg">-->
+<!--              U-->
+<!--            </div>-->
+<!--            <svg class="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">-->
+<!--              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>-->
+<!--            </svg>-->
+<!--          </button>-->
+<!--        </div>-->
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Button (pour responsive) -->
+  <div class="md:hidden absolute top-4 right-4">
+    <button class="p-2 rounded-lg hover:bg-gray-700 transition-colors">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+  </div>
+</nav>
