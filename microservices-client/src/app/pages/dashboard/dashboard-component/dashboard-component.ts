@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {CurrencyPipe, DatePipe, NgForOf, NgIf} from '@angular/common';
+import {Navbar} from '../../../layout/navbar/navbar';
 
 @Component({
   selector: 'app-dashboard-component',
@@ -7,7 +8,8 @@ import {CurrencyPipe, DatePipe, NgForOf, NgIf} from '@angular/common';
     NgIf,
     CurrencyPipe,
     DatePipe,
-    NgForOf
+    NgForOf,
+    Navbar
   ],
   templateUrl: './dashboard-component.html',
   styleUrl: './dashboard-component.css',

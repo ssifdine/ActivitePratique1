@@ -2,15 +2,20 @@ package ma.saifdine.hd.customerservice.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ma.saifdine.hd.customerservice.dtos.CustomerRequestDTO;
 import ma.saifdine.hd.customerservice.dtos.CustomerResponseDTO;
 import ma.saifdine.hd.customerservice.service.CustomerService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/customers")
 @RequiredArgsConstructor
@@ -18,8 +23,18 @@ public class CustomerController {
 
     private final CustomerService customerService;
 
+    /**
+     * Créer un customer - Accessible par USER et ADMIN
+     */
     @PostMapping
-    public ResponseEntity<CustomerResponseDTO> create(@Valid @RequestBody CustomerRequestDTO dto) {
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<CustomerResponseDTO> create(
+            @Valid @RequestBody CustomerRequestDTO dto,
+            Authentication authentication) {
+
+        UUID userId = (UUID) authentication.getPrincipal();
+        log.info("User {} is creating a customer", userId);
+
         return ResponseEntity.ok(customerService.createCustomer(dto));
     }
 
@@ -29,6 +44,7 @@ public class CustomerController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('USER')")
     public ResponseEntity<List<CustomerResponseDTO>> getAll() {
         return ResponseEntity.ok(customerService.getAllCustomers());
     }

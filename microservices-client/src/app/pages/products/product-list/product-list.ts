@@ -3,6 +3,7 @@ import {Product} from '../../../core/models/product.model';
 import {ProductService} from '../../../core/services/product.service';
 import {RouterLink} from '@angular/router';
 import {DecimalPipe, NgClass, NgForOf, NgIf} from '@angular/common';
+import {Navbar} from '../../../layout/navbar/navbar';
 
 @Component({
   selector: 'app-product-list',
@@ -11,7 +12,8 @@ import {DecimalPipe, NgClass, NgForOf, NgIf} from '@angular/common';
     NgForOf,
     NgClass,
     DecimalPipe,
-    NgIf
+    NgIf,
+    Navbar
   ],
   templateUrl: './product-list.html',
   styleUrl: './product-list.css',
