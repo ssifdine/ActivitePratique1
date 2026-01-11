@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {Router} from '@angular/router';
-import {Observable, tap} from 'rxjs';
-import {AuthResponse} from '../models/AuthResponse.model';
-import {LoginRequest} from '../models/loginRequest.model';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
+
+import { AuthResponse } from '../models/AuthResponse.model';
+import { LoginRequest } from '../models/loginRequest.model';
+import { RegisterRequest } from '../models/RegisterRequest.model';
+import { RegisterResponse } from '../models/RegisterResponse.model';
 
 @Injectable({
   providedIn: 'root',
@@ -27,6 +29,13 @@ export class AuthService {
       );
   }
 
+  register(request: RegisterRequest): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(
+      `${this.apiUrl}/register`,
+      request
+    );
+  }
+
   logout(): void {
     localStorage.clear();
   }
@@ -46,5 +55,4 @@ export class AuthService {
   isAuthenticated(): boolean {
     return !!this.getToken();
   }
-
 }
