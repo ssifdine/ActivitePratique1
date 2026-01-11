@@ -1,9 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {CustomerService} from '../../../core/services/customer.service';
-import {RouterLink} from '@angular/router';
+import {RouterLink, RouterOutlet} from '@angular/router';
 import {NgForOf, NgIf} from '@angular/common';
 import {Customer} from '../../../core/models/customer.model';
 import {FormsModule} from '@angular/forms';
+import {Navbar} from '../../../layout/navbar/navbar';
 
 @Component({
   selector: 'app-customer-list',
@@ -11,7 +12,8 @@ import {FormsModule} from '@angular/forms';
     RouterLink,
     NgForOf,
     FormsModule,
-    NgIf
+    NgIf,
+    Navbar
   ],
   templateUrl: './customer-list.html',
   styleUrl: './customer-list.css',

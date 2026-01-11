@@ -8,9 +8,11 @@ import {BillForm} from './pages/bills/bill-form/bill-form';
 import {CustomerEdit} from './pages/customers/customer-edit/customer-edit';
 import {BillDetails} from './pages/bills/bill-details/bill-details';
 import {DashboardComponent} from './pages/dashboard/dashboard-component/dashboard-component';
+import {Login} from './pages/auth/login/login';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'customers', pathMatch: 'full' },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'login' , component: Login },
 
   { path: 'customers', component: CustomerList },
   { path: 'customers/new', component: CustomerForm },

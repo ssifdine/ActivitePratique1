@@ -84,17 +84,44 @@
         <!-- Separator -->
         <div class="w-px h-8 bg-gray-700 mx-2"></div>
 
-        <!-- User Menu / Profile -->
-<!--        <div class="flex items-center gap-3 pl-2">-->
-<!--          <button class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-700 transition-all group">-->
-<!--            <div class="w-8 h-8 bg-gradient-to-br from-orange-400 to-pink-500 rounded-full flex items-center justify-center text-sm font-bold shadow-lg">-->
-<!--              U-->
-<!--            </div>-->
-<!--            <svg class="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">-->
-<!--              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>-->
-<!--            </svg>-->
-<!--          </button>-->
-<!--        </div>-->
+<!--         User Menu / Profile-->
+        <!-- User Menu -->
+        <div *ngIf="user" class="relative group pl-2">
+          <button class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-700 transition-all">
+
+            <!-- Avatar -->
+            <div
+              class="w-8 h-8 bg-gradient-to-br from-orange-400 to-pink-500 rounded-full flex items-center justify-center text-sm font-bold shadow-lg uppercase">
+              {{ user.email?.charAt(0) }}
+            </div>
+
+            <!-- Email -->
+<!--            <span clas="text-sm text-gray-300 hidden md:block">-->
+<!--      {{ user.email }}-->
+<!--    </span>-->
+
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+
+          <!-- Dropdown -->
+          <div
+            class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-xl shadow-xl opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 transition-all origin-top-right">
+
+            <div class="px-4 py-3 text-sm text-gray-300 border-b border-gray-700">
+              <div class="font-semibold">{{ user.role }}</div>
+              <div class="text-xs truncate">{{ user.email }}</div>
+            </div>
+
+            <button
+              (click)="logout()"
+              class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700 rounded-b-xl">
+              🚪 Logout
+            </button>
+          </div>
+        </div>
+
 
       </div>
     </div>
