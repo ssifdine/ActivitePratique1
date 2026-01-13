@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,9 +25,16 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponseDTO createCustomer(CustomerRequestDTO dto) {
+        // Vérifier si l'email existe déjà
+        Optional<Customer> existing = customerRepository.findByEmail(dto.getEmail());
+        if (existing.isPresent()) {
+            throw new IllegalArgumentException("Email already exists: " + dto.getEmail());
+        }
+
         Customer customer = mapper.toEntity(dto);
         return mapper.toDTO(customerRepository.save(customer));
     }
+
 
     @Override
     public CustomerResponseDTO getCustomer(Long id) {

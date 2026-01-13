@@ -1,25 +1,25 @@
-import {Component, OnInit} from '@angular/core';
-import {CustomerService} from '../../../core/services/customer.service';
-import {RouterLink, RouterOutlet} from '@angular/router';
-import {NgForOf, NgIf} from '@angular/common';
-import {Customer} from '../../../core/models/customer.model';
-import {FormsModule} from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { CustomerService } from '../../../core/services/customer.service';
+import { Customer } from '../../../core/models/customer.model';
+import { AuthService } from '../../../core/services/auth-service';
 import {Navbar} from '../../../layout/navbar/navbar';
+import {RouterLink} from '@angular/router';
+import {FormsModule} from '@angular/forms';
+import {NgForOf, NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-customer-list',
+  templateUrl: './customer-list.html',
   imports: [
+    Navbar,
     RouterLink,
-    NgForOf,
     FormsModule,
     NgIf,
-    Navbar
+    NgForOf
   ],
-  templateUrl: './customer-list.html',
-  styleUrl: './customer-list.css',
+  styleUrls: ['./customer-list.css']
 })
 export class CustomerList implements OnInit {
-
 
   customers: Customer[] = [];
   keyword: string = '';
@@ -27,9 +27,15 @@ export class CustomerList implements OnInit {
   size: number = 10;
   totalPages: number = 0;
 
-  constructor(private service: CustomerService) {}
+  isAdmin = false;
+
+  constructor(
+    private service: CustomerService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
+    this.isAdmin = this.authService.isAdmin(); // récupère le rôle
     this.loadCustomers();
   }
 
@@ -41,7 +47,7 @@ export class CustomerList implements OnInit {
   }
 
   search() {
-    this.page = 0; // reset page on new search
+    this.page = 0;
     this.loadCustomers();
   }
 

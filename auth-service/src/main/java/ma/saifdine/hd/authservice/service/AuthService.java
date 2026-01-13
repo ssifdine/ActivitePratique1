@@ -40,6 +40,9 @@ public class AuthService {
     @Value("${jwt.refresh-expiration}")
     private Long refreshExpiration;
 
+    @Value("${jwt.expiration}")
+    private Long expiration;
+
     @Transactional
     public Map register(RegisterRequest request) {
         if (credentialRepository.existsByEmail(request.getEmail())) {
@@ -80,6 +83,55 @@ public class AuthService {
         return response;
     }
 
+    @Transactional
+    public AuthResponse refreshAccessToken(String refreshToken) {
+        // Valider le format et l'expiration du refresh token
+        if (!jwtService.isTokenValid(refreshToken)) {
+            throw new UnauthorizedException("Invalid or expired refresh token");
+        }
+
+        // Extraire l'userId du refresh token
+        UUID userId = jwtService.extractUserId(refreshToken);
+
+        // Vérifier que le refresh token existe en base et n'est pas révoqué
+        RefreshToken storedToken = refreshTokenRepository
+                .findByUserIdAndTokenHashAndRevokedFalse(userId, refreshToken)
+                .orElseThrow(() -> new UnauthorizedException("Refresh token not found or revoked"));
+
+        // Vérifier que le token n'est pas expiré en base
+        if (storedToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new UnauthorizedException("Refresh token has expired");
+        }
+
+        // Récupérer les credentials de l'utilisateur
+        AuthCredential credential = credentialRepository
+                .findByUserId(userId)
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
+
+        // Vérifier que le compte est actif
+        if (!credential.getIsActive()) {
+            throw new UnauthorizedException("Account is disabled");
+        }
+
+        // Générer un nouveau access token
+        String newAccessToken = jwtService.generateAccessToken(credential);
+
+        // Optionnel : Générer un nouveau refresh token (rotation)
+//         String newRefreshToken = jwtService.generateRefreshToken(userId);
+//         storedToken.setRevoked(true);
+//         refreshTokenRepository.save(storedToken);
+//         saveRefreshToken(userId, newRefreshToken);
+
+        return AuthResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(refreshToken) // ou newRefreshToken si rotation
+                .expiresIn(expiration)
+                .role(credential.getRole().name())
+                .userId(credential.getUserId())
+                .email(credential.getEmail())
+                .build();
+    }
+
     public AuthResponse login(LoginRequest request) {
 
         AuthCredential credential = credentialRepository.findByEmail(request.getEmail())
@@ -112,7 +164,7 @@ public class AuthService {
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .expiresIn(900000L)
+                .expiresIn(expiration)
                 .role(credential.getRole().name())
                 .userId(credential.getUserId())
                 .email(credential.getEmail())
@@ -140,4 +192,19 @@ public class AuthService {
 
         refreshTokenRepository.save(refreshToken);
     }
+
+    @Transactional
+    public void logout(String refreshToken) {
+        UUID userId = jwtService.extractUserId(refreshToken);
+
+        RefreshToken token = refreshTokenRepository
+                .findByUserIdAndTokenHashAndRevokedFalse(userId, refreshToken)
+                .orElseThrow(() -> new UnauthorizedException("Invalid refresh token"));
+
+        token.setRevoked(true);
+        refreshTokenRepository.save(token);
+
+        log.info("User {} logged out successfully", userId);
+    }
+
 }

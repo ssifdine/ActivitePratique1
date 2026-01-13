@@ -27,7 +27,7 @@ public class CustomerController {
      * Créer un customer - Accessible par USER et ADMIN
      */
     @PostMapping
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<CustomerResponseDTO> create(
             @Valid @RequestBody CustomerRequestDTO dto,
             Authentication authentication) {
@@ -39,17 +39,19 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<CustomerResponseDTO> get(@PathVariable Long id) {
         return ResponseEntity.ok(customerService.getCustomer(id));
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<List<CustomerResponseDTO>> getAll() {
         return ResponseEntity.ok(customerService.getAllCustomers());
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<Page<CustomerResponseDTO>> searchCustomerPagenation(
             @RequestParam(name = "keyword", defaultValue = "") String keyword,
             @RequestParam(name = "page", defaultValue = "0" ) int page,
@@ -62,12 +64,14 @@ public class CustomerController {
 
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<CustomerResponseDTO> updateCustomer(@PathVariable Long id,
                                                       @Valid @RequestBody CustomerRequestDTO dto) {
         return ResponseEntity.ok(customerService.updateCustomer(id, dto));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         customerService.deleteCustomer(id);
         return ResponseEntity.noContent().build();

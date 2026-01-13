@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import ma.saifdine.hd.authservice.dto.AuthResponse;
 import ma.saifdine.hd.authservice.dto.LoginRequest;
+import ma.saifdine.hd.authservice.dto.RefreshTokenRequest;
 import ma.saifdine.hd.authservice.dto.RegisterRequest;
 import ma.saifdine.hd.authservice.service.AuthService;
 import org.springframework.http.ResponseEntity;
@@ -31,4 +32,14 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(request));
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(authService.refreshAccessToken(request.getRefreshToken()));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, String>> logout(@Valid @RequestBody RefreshTokenRequest response) {
+        authService.logout(response.getRefreshToken());
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
+    }
 }

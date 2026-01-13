@@ -15,28 +15,43 @@ import { DashboardComponent } from './pages/dashboard/dashboard-component/dashbo
 
 import { LoginComponent } from './pages/auth/login/login.component';
 import { RegisterComponent } from './pages/auth/register/register.component';
+import { NotAuthorizedComponent } from './pages/not-authorized/not-authorized.component';
 
 import { authGuard } from './guards/auth-guard';
+import {authorizationGuardGuard} from './guards/authorization-guard-guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
 
-  // 🔓 Public
+  /* ================= PUBLIC ================= */
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'not-authorized', component: NotAuthorizedComponent },
 
-  // 🔐 Protected
-  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
+  /* ================= PROTECTED ================= */
+  {
+    path: '',
+    canActivate: [authGuard],
+    children: [
+      { path: 'dashboard', component: DashboardComponent },
 
-  { path: 'customers', component: CustomerList, canActivate: [authGuard] },
-  { path: 'customers/new', component: CustomerForm, canActivate: [authGuard] },
-  { path: 'customers/:id/edit', component: CustomerEdit, canActivate: [authGuard] },
+      // Customers
+      { path: 'customers', component: CustomerList },
+      { path: 'customers/new', component: CustomerForm , canActivate : [authorizationGuardGuard], data : { role : "ADMIN"} },
+      { path: 'customers/:id/edit', component: CustomerEdit },
 
-  { path: 'products', component: ProductList, canActivate: [authGuard] },
-  { path: 'products/new', component: ProductForm, canActivate: [authGuard] },
-  { path: 'products/:id/edit', component: ProductForm, canActivate: [authGuard] },
+      // Products
+      { path: 'products', component: ProductList },
+      { path: 'products/new', component: ProductForm },
+      { path: 'products/:id/edit', component: ProductForm },
 
-  { path: 'bills', component: BillList, canActivate: [authGuard] },
-  { path: 'bills/new', component: BillForm, canActivate: [authGuard] },
-  { path: 'bills/:id', component: BillDetails, canActivate: [authGuard] },
+      // Bills
+      { path: 'bills', component: BillList },
+      { path: 'bills/new', component: BillForm },
+      { path: 'bills/:id', component: BillDetails },
+    ]
+  },
+
+  /* ================= FALLBACK ================= */
+  { path: '**', redirectTo: 'login' }
 ];

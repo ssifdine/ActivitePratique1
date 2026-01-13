@@ -1,9 +1,11 @@
 package ma.saifdine.hd.customerservice.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import ma.saifdine.hd.customerservice.exception.TokenExpiredException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +46,12 @@ public class JwtService {
 
     public boolean isTokenValid(String token) {
         try {
-            return !isTokenExpired(token);
+            if (isTokenExpired(token)) {
+                throw new TokenExpiredException();
+            }
+            return true;
+        } catch (ExpiredJwtException e) {
+            throw new TokenExpiredException(); // si jjwt détecte un token expiré automatiquement
         } catch (Exception e) {
             log.error("Token validation error: {}", e.getMessage());
             return false;
@@ -52,7 +59,9 @@ public class JwtService {
     }
 
     private boolean isTokenExpired(String token) {
-        return extractClaims(token).getExpiration().before(new Date());
+        Date expiration = extractClaims(token).getExpiration();
+        return expiration.before(new Date());
     }
+
 
 }
