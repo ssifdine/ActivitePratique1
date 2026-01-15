@@ -9,7 +9,8 @@
           <h1 class="text-3xl font-bold text-gray-900 mb-2">Product Catalog</h1>
           <p class="text-gray-500">Manage your product inventory and pricing</p>
         </div>
-        <a routerLink="/products/new"
+        <a *ngIf="isAdmin"
+          routerLink="/products/new"
            class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-xl font-medium hover:from-green-700 hover:to-green-800 shadow-lg shadow-green-500/30 transition-all">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -130,7 +131,7 @@
               </div>
             </th>
             <th class="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-              <div class="flex items-center justify-center gap-2">
+              <div *ngIf="isAdmin" class="flex items-center justify-center gap-2">
                 <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
                 </svg>
@@ -179,7 +180,7 @@
                   {{p.quantity}} units
                 </span>
             </td>
-            <td class="px-6 py-4">
+            <td *ngIf="isAdmin" class="px-6 py-4">
               <div class="flex items-center justify-center gap-2">
                 <a [routerLink]="['/products', p.id, 'edit']"
                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"

@@ -8,6 +8,8 @@ import ma.saifdine.hd.billingservice.dtos.response.ApiResponse;
 import ma.saifdine.hd.billingservice.service.BillService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,20 +27,26 @@ public class BillController {
      * POST /api/bills
      */
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<BillDetailDTO>> createBill(
-            @Valid @RequestBody CreateBillDTO createDTO) {
-
-        BillDetailDTO bill = billService.createBill(createDTO);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Bill created successfully", bill));
+            @Valid @RequestBody CreateBillDTO createDTO,
+            Authentication authentication
+    ) {
+        log.info("Authenticated user: {}", authentication.getName());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(
+                        "Bill created successfully",
+                        billService.createBill(createDTO)
+                ));
     }
+
 
     /**
      * Récupérer toutes les factures
      * GET /api/bills
      */
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<ApiResponse<List<BillSummaryDTO>>> getAllBills() {
         log.info("REST request to get all bills");
 
@@ -51,6 +59,7 @@ public class BillController {
      * GET /api/bills/{id}
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<ApiResponse<BillDetailDTO>> getBillById(@PathVariable Long id) {
         log.info("REST request to get bill: {}", id);
 
@@ -63,6 +72,7 @@ public class BillController {
      * GET /api/bills/customer/{customerId}
      */
     @GetMapping("/customer/{customerId}")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<ApiResponse<List<BillSummaryDTO>>> getBillsByCustomerId(
             @PathVariable Long customerId) {
         log.info("REST request to get bills for customer: {}", customerId);
@@ -76,6 +86,7 @@ public class BillController {
      * PUT /api/bills
      */
     @PutMapping
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<BillDetailDTO>> updateBill(
             @Valid @RequestBody UpdateBillDTO updateDTO) {
         log.info("REST request to update bill: {}", updateDTO.getId());
@@ -89,6 +100,7 @@ public class BillController {
      * DELETE /api/bills/{id}
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> deleteBill(@PathVariable Long id) {
         log.info("REST request to delete bill: {}", id);
 
@@ -101,6 +113,7 @@ public class BillController {
      * GET /api/bills/customer/{customerId}/stats
      */
     @GetMapping("/customer/{customerId}/stats")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<ApiResponse<CustomerBillStatsDTO>> getCustomerStats(
             @PathVariable Long customerId) {
         log.info("REST request to get bill stats for customer: {}", customerId);

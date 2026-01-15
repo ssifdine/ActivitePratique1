@@ -1,5 +1,6 @@
 package ma.saifdine.hd.billingservice.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ma.saifdine.hd.billingservice.clients.CustomerServiceRestClient;
@@ -37,10 +38,18 @@ public class BillServiceImpl implements BillService {
         // 1 - Verifier que le client existe
         CustomerDTO customerDTO;
         try {
-            customerDTO = customerServiceRestClient.findCustomerById(createBillDTO.getCustomerId());
-        } catch (Exception e) {
+            customerDTO = customerServiceRestClient
+                    .findCustomerById(createBillDTO.getCustomerId());
+        } catch (FeignException.NotFound e) {
             throw new CustomerNotFoundException(createBillDTO.getCustomerId());
+        } catch (FeignException.Forbidden e) {
+            throw new RuntimeException("Access denied to Customer Service");
+        } catch (FeignException e) {
+            throw new RuntimeException(
+                    "Error calling Customer Service: " + e.contentUTF8()
+            );
         }
+
 
         // 2 - Mapper CreateBillDTO --> Bill (MapStruct)
         Bill bill = billMapper.toEntity(createBillDTO);

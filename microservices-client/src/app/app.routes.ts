@@ -37,7 +37,7 @@ export const routes: Routes = [
 
       // Customers
       { path: 'customers', component: CustomerList },
-      { path: 'customers/new', component: CustomerForm , canActivate : [authorizationGuardGuard], data : { role : "ADMIN"} },
+      { path: 'customers/new', component: CustomerForm },
       { path: 'customers/:id/edit', component: CustomerEdit },
 
       // Products

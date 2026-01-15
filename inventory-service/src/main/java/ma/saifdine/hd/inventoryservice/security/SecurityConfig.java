@@ -1,8 +1,7 @@
-package ma.saifdine.hd.customerservice.config;
+package ma.saifdine.hd.inventoryservice.security;
 
 import jakarta.ws.rs.HttpMethod;
 import lombok.RequiredArgsConstructor;
-import ma.saifdine.hd.customerservice.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -32,10 +31,10 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
                         // Endpoints customers - require authentication
-//                        .requestMatchers(HttpMethod.GET, "/api/customers/**").authenticated()
-//                        .requestMatchers(HttpMethod.POST, "/api/customers").hasAnyRole("USER", "ADMIN")
-//                        .requestMatchers(HttpMethod.PUT, "/api/customers/**").hasAnyRole("USER", "ADMIN")
-//                        .requestMatchers(HttpMethod.DELETE, "/api/customers/**").hasRole("ADMIN")
+//                        .requestMatchers(HttpMethod.GET, "/api/products/**").authenticated()
+//                        .requestMatchers(HttpMethod.POST, "/api/products").hasAnyRole("USER", "ADMIN")
+//                        .requestMatchers(HttpMethod.PUT, "/api/products/**").hasAnyRole("USER", "ADMIN")
+//                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
 
                         // Tous les autres endpoints nécessitent une authentification
                         .anyRequest().authenticated()

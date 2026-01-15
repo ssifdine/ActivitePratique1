@@ -4,6 +4,7 @@ import {ProductService} from '../../../core/services/product.service';
 import {RouterLink} from '@angular/router';
 import {DecimalPipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {Navbar} from '../../../layout/navbar/navbar';
+import {AuthService} from '../../../core/services/auth-service';
 
 @Component({
   selector: 'app-product-list',
@@ -22,9 +23,14 @@ export class ProductList implements OnInit {
 
   products: Product[] = [];
 
-  constructor(private productService: ProductService) {}
+  isAdmin = false;
+
+
+  constructor(private productService: ProductService,
+              private authService: AuthService) {}
 
   ngOnInit(): void {
+    this.isAdmin = this.authService.isAdmin(); // récupère le rôle
     this.loadProducts();
   }
 

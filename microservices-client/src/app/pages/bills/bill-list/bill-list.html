@@ -9,7 +9,7 @@
           <h1 class="text-3xl font-bold text-gray-900 mb-2">Invoice Management</h1>
           <p class="text-gray-500">Track and manage all your invoices</p>
         </div>
-        <a routerLink="/bills/new"
+        <a *ngIf="isAdmin" routerLink="/bills/new"
            class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl font-medium hover:from-purple-700 hover:to-purple-800 shadow-lg shadow-purple-500/30 transition-all">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -202,7 +202,7 @@
                   </svg>
                   View
                 </a>
-                <button (click)="deleteBill(b.id)"
+                <button *ngIf="isAdmin" (click)="deleteBill(b.id)"
                         class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-sm font-medium"
                         title="Delete Invoice">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

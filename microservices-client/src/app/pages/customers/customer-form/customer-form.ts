@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {CustomerService} from '../../../core/services/customer.service';
 import {Router, RouterLink} from '@angular/router';
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
   selector: 'app-customer-form',
@@ -38,10 +39,16 @@ export class CustomerForm {
       next: () => {
         this.router.navigateByUrl('/customers');
       },
-      error: err => {
+      error: (err: HttpErrorResponse) => {
         console.error(err);
-        alert('Error while creating customer');
+
+        if (err.status === 409) {
+          alert(err.error); // message backend
+        } else {
+          alert('Unexpected error occurred');
+        }
       }
+
     });
   }
 }

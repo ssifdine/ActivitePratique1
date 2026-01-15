@@ -4,6 +4,7 @@ import {BillService} from '../../../core/services/bill.service';
 import {RouterLink} from '@angular/router';
 import {CurrencyPipe, NgForOf, NgIf} from '@angular/common';
 import {Navbar} from '../../../layout/navbar/navbar';
+import {AuthService} from '../../../core/services/auth-service';
 
 @Component({
   selector: 'app-bill-list',
@@ -20,10 +21,13 @@ import {Navbar} from '../../../layout/navbar/navbar';
 export class BillList implements OnInit {
 
   bills: BillSummary[] = [];
+  isAdmin = false;
 
-  constructor(private billService: BillService) {}
+
+  constructor(private billService: BillService, private authService: AuthService) {}
 
   ngOnInit(): void {
+    this.isAdmin = this.authService.isAdmin(); // récupère le rôle
     this.loadBills();
   }
 

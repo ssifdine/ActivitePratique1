@@ -1,5 +1,6 @@
 package ma.saifdine.hd.billingservice.clients;
 
+import ma.saifdine.hd.billingservice.config.FeignConfig;
 import ma.saifdine.hd.billingservice.dtos.ProductDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient("inventory-service")
+@FeignClient(name = "inventory-service", configuration = FeignConfig.class)
 public interface InventoryServiceRestClient {
 
     @GetMapping("/api/products/{id}")
