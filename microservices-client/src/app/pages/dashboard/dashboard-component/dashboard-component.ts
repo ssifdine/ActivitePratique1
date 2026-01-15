@@ -1,38 +1,43 @@
-import {Component, OnInit} from '@angular/core';
-import {CurrencyPipe, DatePipe, NgForOf, NgIf} from '@angular/common';
-import {Navbar} from '../../../layout/navbar/navbar';
+import { Component, OnInit } from '@angular/core';
+import { CurrencyPipe, DatePipe, NgForOf, NgIf } from '@angular/common';
+import { Navbar } from '../../../layout/navbar/navbar';
+import {CustomerService} from '../../../core/services/customer.service';
+import {ProductService} from '../../../core/services/product.service';
+import {BillService} from '../../../core/services/bill.service';
+
 
 @Component({
   selector: 'app-dashboard-component',
+  standalone: true,
   imports: [
     NgIf,
+    NgForOf,
     CurrencyPipe,
     DatePipe,
-    NgForOf,
     Navbar
   ],
   templateUrl: './dashboard-component.html',
   styleUrl: './dashboard-component.css',
 })
 export class DashboardComponent implements OnInit {
+
   currentDate = new Date();
 
-  // Stats
-  totalRevenue: number = 0;
-  totalCustomers: number = 0;
-  totalProducts: number = 0;
-  totalInvoices: number = 0;
+  // 🔹 Stats
+  totalRevenue = 0;
+  totalCustomers = 0;
+  totalProducts = 0;
+  totalInvoices = 0;
 
-  // Recent data
+  // 🔹 Data
   recentInvoices: any[] = [];
   lowStockProducts: any[] = [];
   topProducts: any[] = [];
 
   constructor(
-    // Injectez vos services ici
-    // private customerService: CustomerService,
-    // private productService: ProductService,
-    // private billService: BillService
+    private customerService: CustomerService,
+    private productService: ProductService,
+    private billService: BillService
   ) {}
 
   ngOnInit(): void {
@@ -40,22 +45,59 @@ export class DashboardComponent implements OnInit {
   }
 
   loadDashboardData(): void {
-    // Charger les statistiques
-    // this.customerService.getAll().subscribe(customers => {
-    //   this.totalCustomers = customers.length;
-    // });
-
-    // this.productService.getAll().subscribe(products => {
-    //   this.totalProducts = products.length;
-    //   this.lowStockProducts = products.filter(p => p.quantity <= 10);
-    //   this.topProducts = products.slice(0, 3); // Top 3 produits
-    // });
-
-    // this.billService.getAll().subscribe(bills => {
-    //   this.totalInvoices = bills.length;
-    //   this.totalRevenue = bills.reduce((sum, bill) => sum + bill.totalAmount, 0);
-    //   this.recentInvoices = bills.slice(0, 5); // 5 dernières factures
-    // });
+    this.loadCustomers();
+    this.loadProducts();
+    this.loadBills();
   }
 
+  // ================= CUSTOMERS =================
+  loadCustomers(): void {
+    this.customerService.getAll().subscribe({
+      next: (customers) => {
+        this.totalCustomers = customers.length;
+      },
+      error: (err) => console.error('Error loading customers', err)
+    });
+  }
+
+  // ================= PRODUCTS =================
+  loadProducts(): void {
+    this.productService.getAll().subscribe({
+      next: (products) => {
+        this.totalProducts = products.length;
+
+        // Low stock (quantity < 5)
+        this.lowStockProducts = products.filter(p => p.quantity < 5);
+
+        // Top products (ex: les 3 plus chers)
+        this.topProducts = [...products]
+          .sort((a, b) => b.price - a.price)
+          .slice(0, 3);
+      },
+      error: (err) => console.error('Error loading products', err)
+    });
+  }
+
+  // ================= BILLS =================
+  loadBills(): void {
+    this.billService.getAll().subscribe({
+      next: (response) => {
+        const bills = response.data;
+
+        this.totalInvoices = bills.length;
+
+        // Total revenue
+        this.totalRevenue = bills.reduce(
+          (sum, bill) => sum + bill.totalAmount,
+          0
+        );
+
+        // Recent invoices (5 dernières)
+        this.recentInvoices = [...bills]
+          .sort((a, b) => b.id - a.id)
+          .slice(0, 5);
+      },
+      error: (err) => console.error('Error loading bills', err)
+    });
+  }
 }
