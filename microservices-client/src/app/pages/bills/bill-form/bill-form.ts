@@ -23,6 +23,8 @@ export class BillForm implements OnInit {
 
   customers: any[] = [];
   products: Product[] = [];
+  errorMessage: string = '';
+  isSubmitting: boolean = false;
 
   bill: CreateBill = {
     customerId: 0,
@@ -40,7 +42,7 @@ export class BillForm implements OnInit {
   ngOnInit(): void {
     this.loadCustomers();
     this.loadProducts();
-    this.addItem(); // ligne par défaut
+    this.addItem();
   }
 
   loadCustomers() {
@@ -64,57 +66,109 @@ export class BillForm implements OnInit {
 
   removeItem(index: number) {
     this.bill.productItems.splice(index, 1);
+    this.errorMessage = ''; // Clear error when items change
   }
 
-  // Nouvelle méthode pour gérer le changement de produit
   onProductChange(index: number) {
-    // Convertir en nombre car ngModel retourne une chaîne depuis le select
     this.bill.productItems[index].productId = Number(this.bill.productItems[index].productId);
+    this.errorMessage = ''; // Clear error when product changes
   }
 
-  // Nouvelle méthode pour gérer le changement de quantité
   onQuantityChange(index: number) {
-    // S'assurer que la quantité est au minimum 1
     if (this.bill.productItems[index].quantity < 1) {
       this.bill.productItems[index].quantity = 1;
     }
-    // Convertir en nombre si nécessaire
     this.bill.productItems[index].quantity = Number(this.bill.productItems[index].quantity);
+    this.errorMessage = ''; // Clear error when quantity changes
+  }
+
+  // Get product by ID
+  getProduct(productId: number): Product | undefined {
+    const id = Number(productId);
+    return this.products.find(p => p.id === id);
+  }
+
+  // Check if quantity exceeds available stock
+  isQuantityExceedingStock(item: any): boolean {
+    const product = this.getProduct(item.productId);
+    if (!product || item.productId === 0) return false;
+    return item.quantity > product.quantity;
+  }
+
+  // Get available stock for a product
+  getAvailableStock(productId: number): number {
+    const product = this.getProduct(productId);
+    return product ? product.quantity : 0;
+  }
+
+  // Validate stock before submission
+  validateStock(): boolean {
+    for (const item of this.bill.productItems) {
+      const product = this.getProduct(item.productId);
+      if (product && item.quantity > product.quantity) {
+        this.errorMessage = `Insufficient stock for ${product.name}. Available: ${product.quantity}, Requested: ${item.quantity}`;
+        return false;
+      }
+    }
+    return true;
   }
 
   submit() {
-    // Validation avant soumission
+    // Clear previous error
+    this.errorMessage = '';
+
+    // Validation
     if (this.bill.customerId === 0) {
-      alert('Veuillez sélectionner un client');
+      this.errorMessage = 'Please select a customer';
       return;
     }
 
     if (this.bill.productItems.length === 0) {
-      alert('Veuillez ajouter au moins un produit');
+      this.errorMessage = 'Please add at least one product';
       return;
     }
 
-    // Vérifier que tous les produits sont sélectionnés
     const hasInvalidProducts = this.bill.productItems.some(item => item.productId === 0);
     if (hasInvalidProducts) {
-      alert('Veuillez sélectionner un produit pour chaque ligne');
+      this.errorMessage = 'Please select a product for each line';
       return;
     }
 
-    this.billService.create(this.bill).subscribe(() => {
-      this.router.navigate(['/bills']);
+    // Validate stock availability
+    if (!this.validateStock()) {
+      return;
+    }
+
+    this.isSubmitting = true;
+
+    this.billService.create(this.bill).subscribe({
+      next: () => {
+        this.router.navigate(['/bills']);
+      },
+      error: (error) => {
+        this.isSubmitting = false;
+
+        // Extract error message from response
+        if (error.error && error.error.message) {
+          this.errorMessage = error.error.message;
+        } else if (error.message) {
+          this.errorMessage = error.message;
+        } else {
+          this.errorMessage = 'An error occurred while creating the invoice. Please try again.';
+        }
+
+        // Scroll to top to show error
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     });
   }
 
   getProductPrice(productId: number): number {
-    // Convertir en nombre si c'est une chaîne
-    const id = Number(productId);
-    const product = this.products.find(p => p.id === id);
+    const product = this.getProduct(productId);
     return product ? product.price : 0;
   }
 
   getLineTotal(item: any): number {
-    // Convertir les valeurs en nombres pour être sûr
     const productId = Number(item.productId);
     const quantity = Number(item.quantity);
     return this.getProductPrice(productId) * quantity;
@@ -127,7 +181,7 @@ export class BillForm implements OnInit {
   }
 
   getTax(): number {
-    return this.getTotal() * 0.20; // 20% de taxe
+    return this.getTotal() * 0.20;
   }
 
   getTotalWithTax(): number {

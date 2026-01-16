@@ -1,6 +1,22 @@
 <div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12 px-4">
   <div class="max-w-5xl mx-auto">
 
+    <!-- Error Alert -->
+    <div *ngIf="errorMessage" class="mb-6 bg-red-50 border-l-4 border-red-500 rounded-lg p-4 flex items-start gap-3 shadow-sm">
+      <svg class="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+      </svg>
+      <div class="flex-1">
+        <h3 class="text-red-800 font-semibold mb-1">Error Creating Invoice</h3>
+        <p class="text-red-700 text-sm">{{ errorMessage }}</p>
+      </div>
+      <button (click)="errorMessage = ''" class="text-red-400 hover:text-red-600">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+    </div>
+
     <!-- Header Section -->
     <div class="mb-8">
       <div class="flex items-center gap-3 mb-2">
@@ -69,7 +85,9 @@
         <!-- Items List -->
         <div class="space-y-4 mb-4">
           <div *ngFor="let item of bill.productItems; let i = index"
-               class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+               class="bg-gray-50 rounded-xl p-4 border"
+               [class.border-red-300]="isQuantityExceedingStock(item)"
+               [class.border-gray-200]="!isQuantityExceedingStock(item)">
 
             <div class="grid grid-cols-12 gap-4 items-start">
 
@@ -85,7 +103,7 @@
                 <label class="block text-xs font-medium text-gray-600 mb-1">Product</label>
                 <div class="relative">
                   <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                     </svg>
                   </div>
@@ -96,7 +114,7 @@
                           required>
                     <option value="0" disabled>Select product...</option>
                     <option *ngFor="let p of products" [value]="p.id">
-                      {{ p.name }} - {{ p.price | currency:'MAD' }}
+                      {{ p.name }} - {{ p.price | currency:'MAD' }} (Stock: {{ p.quantity }})
                     </option>
                   </select>
                   <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -105,6 +123,14 @@
                     </svg>
                   </div>
                 </div>
+
+                <!-- Stock availability info -->
+                <p *ngIf="item.productId && item.productId !== 0" class="mt-1 text-xs"
+                   [class.text-gray-500]="!isQuantityExceedingStock(item)"
+                   [class.text-green-600]="!isQuantityExceedingStock(item) && getAvailableStock(item.productId) > 10"
+                   [class.text-amber-600]="!isQuantityExceedingStock(item) && getAvailableStock(item.productId) <= 10 && getAvailableStock(item.productId) > 0">
+                  Available stock: {{ getAvailableStock(item.productId) }} units
+                </p>
               </div>
 
               <!-- Quantity -->
@@ -121,8 +147,19 @@
                          (ngModelChange)="onQuantityChange(i)"
                          name="quantity{{i}}"
                          min="1"
-                         class="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-sm" />
+                         [max]="getAvailableStock(item.productId)"
+                         class="w-full pl-9 pr-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-sm"
+                         [class.border-red-300]="isQuantityExceedingStock(item)"
+                         [class.border-gray-300]="!isQuantityExceedingStock(item)" />
                 </div>
+
+                <!-- Stock warning -->
+                <p *ngIf="isQuantityExceedingStock(item)" class="mt-1 text-xs text-red-600 font-medium flex items-center gap-1">
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                  </svg>
+                  Exceeds stock!
+                </p>
               </div>
 
               <!-- Line Total -->
@@ -180,7 +217,7 @@
             <span class="text-gray-900 font-semibold text-lg">{{ getTotal() | currency:'MAD' }}</span>
           </div>
 
-          <!-- Tax (Optional - can be customized) -->
+          <!-- Tax -->
           <div class="flex justify-between items-center mb-3 pb-3 border-b border-gray-200">
             <span class="text-gray-600 font-medium">Tax (20%)</span>
             <span class="text-gray-900 font-semibold">{{ getTax() | currency:'MAD' }}</span>
@@ -212,12 +249,17 @@
           </a>
 
           <button (click)="submit()"
-                  class="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium hover:from-purple-700 hover:to-purple-800 shadow-lg shadow-purple-500/30 transition-all">
+                  [disabled]="isSubmitting"
+                  class="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium hover:from-purple-700 hover:to-purple-800 shadow-lg shadow-purple-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
             <span class="flex items-center justify-center gap-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg *ngIf="!isSubmitting" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
               </svg>
-              Create Invoice
+              <svg *ngIf="isSubmitting" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {{ isSubmitting ? 'Creating...' : 'Create Invoice' }}
             </span>
           </button>
         </div>
@@ -232,7 +274,7 @@
       </svg>
       <div class="text-sm text-purple-800">
         <p class="font-medium mb-1">Invoice Creation Tips</p>
-        <p class="text-purple-700">Make sure to select the correct customer and verify all product quantities before creating the invoice. You can add multiple items to the same invoice.</p>
+        <p class="text-purple-700">Stock levels are displayed for each product. Quantities that exceed available stock will be highlighted in red and must be corrected before submitting.</p>
       </div>
     </div>
 
