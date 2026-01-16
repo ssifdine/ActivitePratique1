@@ -1,15 +1,13 @@
 import { Component } from '@angular/core';
-import {NgIf} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {RouterLink} from '@angular/router';
+import { NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import {AuthService} from '../../../../core/services/auth-service';
 
 @Component({
   selector: 'app-forgot-password-component',
-  imports: [
-    NgIf,
-    FormsModule,
-    RouterLink
-  ],
+  standalone: true,
+  imports: [NgIf, FormsModule, RouterLink],
   templateUrl: './forgot-password-component.html',
   styleUrl: './forgot-password-component.css',
 })
@@ -17,23 +15,50 @@ export class ForgotPasswordComponent {
 
   email = '';
   emailSent = false;
+  isLoading = false;
+  errorMessage = '';
+
+  constructor(private authService: AuthService) {}
 
   sendResetLink(): void {
     if (!this.email) {
-      alert('Please enter your email address');
+      this.errorMessage = 'Veuillez entrer votre adresse email';
       return;
     }
 
-    // Appel API pour envoyer le lien
-    // this.authService.forgotPassword(this.email).subscribe(...)
+    if (!this.isValidEmail(this.email)) {
+      this.errorMessage = 'Veuillez entrer une adresse email valide';
+      return;
+    }
 
-    // Simuler l'envoi
-    this.emailSent = true;
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.authService.forgotPassword(this.email).subscribe({
+      next: (response) => {
+        console.log('Reset email response:', response);
+        this.emailSent = true;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error sending reset email:', error);
+        // Même en cas d'erreur, on affiche un message générique
+        // pour ne pas révéler si l'email existe ou non
+        this.emailSent = true;
+        this.isLoading = false;
+      }
+    });
   }
 
   resendEmail(): void {
-    // Renvoyer l'email
-    console.log('Resending email to:', this.email);
-    // this.authService.forgotPassword(this.email).subscribe(...)
+    this.emailSent = false;
+    this.isLoading = false;
+    this.errorMessage = '';
+    // L'utilisateur peut renvoyer en cliquant à nouveau sur le bouton
+  }
+
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   }
 }

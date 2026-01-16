@@ -7,6 +7,7 @@ import { AuthResponse } from '../models/AuthResponse.model';
 import { LoginRequest } from '../models/loginRequest.model';
 import { RegisterRequest } from '../models/RegisterRequest.model';
 import { RegisterResponse } from '../models/RegisterResponse.model';
+import {MessageResponse} from '../models/MessageResponse.model';
 
 @Injectable({
   providedIn: 'root',
@@ -129,5 +130,24 @@ export class AuthService {
 
   isUser(): boolean {
     return this.hasRole('USER');
+  }
+
+  // ============= PASSWORD RESET ===================
+
+  forgotPassword(email: string): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(`${this.apiUrl}/forgot-password`, { email });
+  }
+
+  validateResetToken(token: string): Observable<MessageResponse> {
+    return this.http.get<MessageResponse>(`${this.apiUrl}/validate-reset-token`, {
+      params: { token }
+    });
+  }
+
+  resetPassword(token:string, newPassword: string): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(`${this.apiUrl}/reset-password`, {
+      token,
+      newPassword
+    });
   }
 }

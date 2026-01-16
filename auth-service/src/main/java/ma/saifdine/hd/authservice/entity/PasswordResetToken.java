@@ -1,39 +1,54 @@
 package ma.saifdine.hd.authservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "password_reset_tokens")
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class PasswordResetToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true)
+    private String token;
 
     @Column(nullable = false)
     private UUID userId;
 
-    @Column(nullable = false, unique = true)
-    private String tokenHash;
+    @Column(nullable = false)
+    private String email;
 
     @Column(nullable = false)
-    private LocalDateTime expiryTime;
+    private LocalDateTime expiryDate;
 
     @Column(nullable = false)
-    private Boolean used = false;
+    private boolean used = false;
 
-    @CreationTimestamp
+    @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        // Token valide pendant 1 heure
+        this.expiryDate = LocalDateTime.now().plusHours(1);
+    }
+
+    public boolean isExpired() {
+        return LocalDateTime.now().isAfter(this.expiryDate);
+    }
+
+    public boolean isValid() {
+        return !used && !isExpired();
+    }
 }

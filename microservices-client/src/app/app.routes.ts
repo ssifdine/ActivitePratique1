@@ -20,6 +20,7 @@ import { NotAuthorizedComponent } from './pages/not-authorized/not-authorized.co
 import { authGuard } from './guards/auth-guard';
 import {authorizationGuardGuard} from './guards/authorization-guard-guard';
 import {ForgotPasswordComponent} from './pages/auth/password/forgot-password-component/forgot-password-component';
+import {ResetPasswordComponent} from './pages/auth/password/reset-password-component/reset-password-component';
 
 export const routes: Routes = [
 
@@ -29,6 +30,7 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'not-authorized', component: NotAuthorizedComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
 
   /* ================= PROTECTED ================= */
   {
