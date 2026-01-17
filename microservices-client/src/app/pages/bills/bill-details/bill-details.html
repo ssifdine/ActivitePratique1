@@ -12,24 +12,34 @@
       </a>
 
       <div class="flex gap-3">
-        <button class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 transition-all">
+        <button
+          (click)="printInvoice()"
+          class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 transition-all">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
           </svg>
           Print
         </button>
-        <button class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl font-medium hover:from-purple-700 hover:to-purple-800 shadow-lg shadow-purple-500/30 transition-all">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button
+          (click)="downloadPdfDirect()"
+          [disabled]="isGeneratingPdf"
+          class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl font-medium hover:from-purple-700 hover:to-purple-800 shadow-lg shadow-purple-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+          <svg *ngIf="!isGeneratingPdf" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
           </svg>
-          Download PDF
+          <svg *ngIf="isGeneratingPdf" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ isGeneratingPdf ? 'Génération...' : 'Download PDF' }}
         </button>
       </div>
     </div>
 
     <!-- Invoice Card -->
-    <div class="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+    <div id="invoice-content" class="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
 
+      <!-- Le reste du contenu reste identique -->
       <!-- Invoice Header -->
       <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-8 py-8 text-white">
         <div class="flex justify-between items-start">
@@ -91,7 +101,7 @@
             <div class="bg-purple-50 rounded-xl p-4 border border-purple-200">
               <p class="font-bold text-gray-900 text-lg mb-1">App-MicroService</p>
               <p class="text-gray-600 text-sm">Your Company Name</p>
-              <p class="text-gray-600 text-sm">"contact&#64;company.com</p>
+              <p class="text-gray-600 text-sm">contact&#64;company.com</p>
               <p class="text-gray-600 text-sm mt-2">123 Business Street</p>
               <p class="text-gray-600 text-sm">City, Country 12345</p>
             </div>
