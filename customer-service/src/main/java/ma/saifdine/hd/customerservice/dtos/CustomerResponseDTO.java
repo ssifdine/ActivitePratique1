@@ -3,13 +3,17 @@ package ma.saifdine.hd.customerservice.dtos;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @AllArgsConstructor @NoArgsConstructor
 @Builder
-public class CustomerResponseDTO {
+public class CustomerResponseDTO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private Long id;
     private String fullName;
     private String email;

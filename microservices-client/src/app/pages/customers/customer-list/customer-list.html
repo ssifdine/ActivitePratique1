@@ -206,7 +206,7 @@
             <td class="px-6 py-4">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                  {{ c.fullName.charAt(0) || '?' }}
+                  {{ (c.fullName && c.fullName.charAt(0)) || '?' }}
                 </div>
                 <div>
                   <div class="font-medium text-gray-900">{{c.fullName}}</div>
@@ -312,10 +312,3 @@
     </div>
   </div>
 </div>
-
-
-<!-- ============================================ -->
-<!-- 2. customer-form.html (avec validation email) -->
-<!-- ============================================ -->
-<!-- Ajoutez cette section après le champ email: -->
-

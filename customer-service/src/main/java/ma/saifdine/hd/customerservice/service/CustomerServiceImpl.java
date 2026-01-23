@@ -10,6 +10,10 @@ import ma.saifdine.hd.customerservice.exception.CustomerNotFoundException;
 import ma.saifdine.hd.customerservice.mapper.CustomerMapper;
 import ma.saifdine.hd.customerservice.repository.CustomerRepository;
 import ma.saifdine.hd.customerservice.repository.CustomerSpecifications;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +41,7 @@ public class CustomerServiceImpl implements CustomerService {
      */
 
     @Override
+    @CacheEvict(value = "customerList", allEntries = true)
     public CustomerResponseDTO createCustomer(CustomerRequestDTO dto) {
         log.info("Creating customer with email: {}", dto.getEmail());
 
@@ -54,9 +59,10 @@ public class CustomerServiceImpl implements CustomerService {
 
 
     /**
-     * Récupérer un customer
+     * Récupérer un customer avec cache
      */
     @Override
+    @Cacheable(value = "customers", key = "#id")
     public CustomerResponseDTO getCustomer(Long id) {
         log.debug("Fetching customer with ID: {} from database", id);
 
@@ -68,23 +74,33 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     /**
-     * Liste
+     * Liste avec cache
      */
     @Override
+    @Cacheable(value = "customerList")
     public List<CustomerResponseDTO> getAllCustomers() {
+        long start = System.currentTimeMillis();
+//        log.info("🔍 Cache MISS - Fetching from DATABASE");
 
-        log.debug("Fetching all active customers from database");
-
-        return customerRepository.findAll()
+        List<CustomerResponseDTO> customers = customerRepository.findAll()
                 .stream()
                 .map(mapper::toDTO)
-                .toList();
+                .collect(Collectors.toList());
+
+        long duration = System.currentTimeMillis() - start;
+//        log.info("✅ Fetched {} customers from DB in {}ms", customers.size(), duration);
+
+        return customers;
     }
 
     /**
-     * Mise à jour
+     * Mise à jour avec invalidation cache
      */
     @Override
+    @Caching(
+            put = @CachePut(value = "customers", key = "#id"),
+            evict = @CacheEvict(value = "customerList", allEntries = true)
+    )
     public CustomerResponseDTO updateCustomer(Long id, CustomerRequestDTO dto) {
         log.info("Updating customer with ID: {}", id);
 
@@ -119,6 +135,10 @@ public class CustomerServiceImpl implements CustomerService {
      * Soft delete
      */
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "customers", key = "#id"),
+            @CacheEvict(value = "customerList", allEntries = true)
+    })
     public void deleteCustomer(Long id) {
         log.info("Soft deleting customer with ID: {}", id);
 
@@ -135,6 +155,7 @@ public class CustomerServiceImpl implements CustomerService {
      * Hard delete (admin only)
      */
     @Override
+    @CacheEvict(value = {"customers","customerList"}, allEntries = true)
     public void hardDeleteCustomer(Long id) {
         log.warn("Hard deleting customer with ID: {}", id);
 
@@ -299,6 +320,10 @@ public class CustomerServiceImpl implements CustomerService {
      * Restaurer un client soft deleted
      */
     @Override
+    @Caching(
+            put = @CachePut(value = "customers", key = "#id"),
+            evict = @CacheEvict(value = "customerList", allEntries = true)
+    )
     public CustomerResponseDTO restoreCustomer(Long id) {
         log.info("Restoring customer with ID: {}", id);
 
