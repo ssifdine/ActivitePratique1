@@ -10,6 +10,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -23,7 +24,11 @@ import java.time.Duration;
 @EnableCaching
 public class RedisConfig {
 
-    @Bean
+    /**
+     * ObjectMapper SPÉCIFIQUE pour Redis uniquement
+     * Avec activateDefaultTyping pour gérer la désérialisation des types polymorphiques
+     */
+    @Bean(name = "redisObjectMapper")
     public ObjectMapper redisObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -34,15 +39,32 @@ public class RedisConfig {
                 .allowIfBaseType(Object.class)
                 .build();
 
-//        mapper.activateDefaultTyping(ptv,
-//                ObjectMapper.DefaultTyping.NON_FINAL,
-//                JsonTypeInfo.As.PROPERTY); // Plus lisible que WRAPPER_ARRAY
+        // IMPORTANT: Activé uniquement pour Redis
+        // Ajoute un champ @class dans le JSON pour la désérialisation
+        mapper.activateDefaultTyping(ptv,
+                ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.PROPERTY);
 
+        return mapper;
+    }
+
+    /**
+     * ObjectMapper par défaut pour les contrôleurs REST
+     * SANS activateDefaultTyping pour que Angular puisse parser le JSON proprement
+     */
+    @Bean
+    @Primary
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        // PAS de activateDefaultTyping ici !
         return mapper;
     }
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        // Utilise le redisObjectMapper spécifique
         GenericJackson2JsonRedisSerializer serializer =
                 new GenericJackson2JsonRedisSerializer(redisObjectMapper());
 
